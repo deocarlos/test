@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orlando 15–24/09/2026 — minha lista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lagoa:#06313A; --lagoa-2:#0A444F;
+    --espuma:#F2F7F5; --neblina:#92B5B6;
+    --borda:rgba(242,247,245,.15);
+    --alerta:#FFC24A;
+    --serif:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+    --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--lagoa);color:var(--espuma);
+    font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 18px 90px}
+
+  header h1{font-family:var(--serif);font-weight:800;font-size:clamp(27px,6.5vw,42px);
+    line-height:1.02;margin:0 0 6px;letter-spacing:-.025em}
+  header p.sub{margin:0 0 22px;color:var(--neblina);font-size:15px;max-width:54ch}
+
+  .placar{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;
+    padding:18px 0 16px;border-top:1px solid var(--borda);border-bottom:1px solid var(--borda)}
+  .contagem{font-family:var(--serif);font-weight:800;font-size:42px;line-height:.9;letter-spacing:-.03em}
+  .contagem span{font-size:19px;color:var(--neblina);font-weight:600}
+  .contagem-rot{color:var(--neblina);font-size:14px;margin-bottom:4px}
+  .trilha{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto;max-width:330px;justify-content:flex-end}
+  .grupo{display:flex;gap:3px;align-items:center;background:none;border:0;padding:3px;cursor:pointer;border-radius:6px}
+  .grupo:focus-visible{outline:2px solid currentColor;outline-offset:1px}
+  .pino{width:7px;height:7px;border-radius:50%;border:1.5px solid currentColor;opacity:.5}
+  .pino.on{background:currentColor;opacity:1}
+
+  .abas{display:flex;gap:7px;overflow-x:auto;margin:20px -18px 0;padding:0 18px 10px;
+    scrollbar-width:none}
+  .abas::-webkit-scrollbar{display:none}
+  .aba{flex:none;font:inherit;font-size:14px;font-weight:600;white-space:nowrap;
+    background:transparent;color:var(--neblina);border:1px solid var(--borda);
+    border-radius:999px;padding:8px 14px;cursor:pointer}
+  .aba[aria-pressed="true"]{background:var(--pc);border-color:var(--pc);color:var(--lagoa)}
+  .aba:focus-visible{outline:2px solid var(--pc);outline-offset:2px}
+
+  .filtros{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0 24px}
+  .chip{font:inherit;font-size:13px;font-weight:500;color:var(--neblina);background:transparent;
+    border:1px solid var(--borda);border-radius:999px;padding:6px 13px;cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--espuma);color:var(--lagoa);border-color:var(--espuma)}
+  .chip:focus-visible{outline:2px solid var(--cor);outline-offset:2px}
+
+  .cabeca{margin-bottom:8px}
+  .cabeca h2{font-family:var(--serif);font-weight:800;font-size:24px;margin:0;
+    letter-spacing:-.02em;color:var(--cor)}
+  .cabeca .quantos{color:var(--neblina);font-size:14px;margin:3px 0 0}
+
+  .nota-parque{border:1px dashed rgba(255,194,74,.45);border-radius:9px;padding:13px 15px;
+    margin:16px 0 26px;color:#FFE0A3;font-size:14px;line-height:1.55}
+  .nota-parque b{color:var(--alerta);font-weight:600}
+  .nota-parque ul{margin:7px 0 0;padding-left:18px}
+  .nota-parque li{margin-bottom:5px}
+
+  .area{margin-bottom:30px;padding-left:15px;border-left:3px solid var(--cor)}
+  .area > h3{font-family:var(--serif);font-weight:600;font-size:17px;margin:0 0 11px;
+    letter-spacing:-.01em;color:var(--cor)}
+
+  .item{display:flex;gap:13px;align-items:flex-start;width:100%;text-align:left;
+    background:transparent;border:0;border-top:1px solid var(--borda);
+    padding:12px 2px;color:inherit;font:inherit;cursor:pointer}
+  .item:first-of-type{border-top:0}
+  .item:focus-visible{outline:2px solid var(--cor);outline-offset:2px;border-radius:6px}
+  .marca{flex:none;width:22px;height:22px;margin-top:2px;border-radius:50%;
+    border:1.5px solid var(--borda);display:grid;place-items:center;
+    transition:background .18s ease,border-color .18s ease}
+  .marca svg{width:12px;height:12px;stroke:var(--lagoa);stroke-width:3;fill:none;
+    stroke-linecap:round;stroke-linejoin:round;opacity:0;transform:scale(.5);
+    transition:opacity .18s ease,transform .18s cubic-bezier(.2,1.4,.4,1)}
+  .item[aria-pressed="true"] .marca{background:var(--cor);border-color:var(--cor)}
+  .item[aria-pressed="true"] .marca svg{opacity:1;transform:scale(1)}
+  .item[aria-pressed="true"] .nome{color:var(--neblina)}
+
+  .corpo{min-width:0}
+  .nome{font-weight:600;font-size:15.5px;line-height:1.3;transition:color .18s}
+  .estrela{color:var(--alerta);font-size:12px;margin-left:6px;font-weight:500;vertical-align:1px}
+  .novo{color:var(--cor);font-size:12px;margin-left:6px;font-weight:600;vertical-align:1px}
+  .desc{color:var(--neblina);font-size:13.5px;margin-top:2px}
+  .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .tag{font-size:11.5px;font-weight:500;color:var(--neblina);
+    border:1px solid var(--borda);border-radius:5px;padding:2px 7px}
+  .tag.alt{color:var(--espuma);border-color:rgba(242,247,245,.32)}
+  .quando{font-size:12px;color:var(--cor);margin-top:6px;font-weight:500}
+
+  .bloco-fechadas{margin-top:26px;padding-top:18px;border-top:1px solid var(--borda)}
+  .bloco-fechadas h3{font-family:var(--serif);font-weight:600;font-size:15px;margin:0 0 10px;color:var(--neblina)}
+  .fechada{padding:9px 0;opacity:.72}
+  .fechada .fn{font-weight:600;font-size:14.5px}
+  .fechada .fm{color:var(--neblina);font-size:13.5px}
+
+  .rodape{margin-top:36px;padding-top:20px;border-top:1px solid var(--borda);
+    display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .limpar{font:inherit;font-size:14px;background:transparent;color:var(--neblina);
+    border:1px solid var(--borda);border-radius:8px;padding:9px 15px;cursor:pointer}
+  .limpar:hover{color:#FF6B5E;border-color:#FF6B5E}
+  .nota{color:var(--neblina);font-size:13px;max-width:44ch;margin:0}
+  #status{font-size:13px;color:var(--alerta);min-height:1.2em;margin:10px 0 0}
+  .vazio{color:var(--neblina);font-size:15px;padding:24px 0}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Orlando, 15 a 24 de setembro</h1>
+    <p class="sub">Sete parques, só com o que está aberto nessas datas e sem nada de Halloween. Toque para marcar; fica salvo automaticamente.</p>
+  </header>
+
+  <div class="placar">
+    <div>
+      <div class="contagem-rot">Marcadas no total</div>
+      <div class="contagem" id="contagem">0<span id="total">/0</span></div>
+    </div>
+    <div class="trilha" id="trilha"></div>
+  </div>
+
+  <div class="abas" id="abas"></div>
+
+  <div class="filtros">
+    <button class="chip" data-filtro="todas" aria-pressed="true">Tudo</button>
+    <button class="chip" data-filtro="falta" aria-pressed="false">Falta fazer</button>
+    <button class="chip" data-filtro="feito" aria-pressed="false">Já fiz</button>
+    <button class="chip" id="f-top" aria-pressed="false">Só as imperdíveis</button>
+  </div>
+
+  <main id="conteudo"><p class="vazio">Carregando sua lista…</p></main>
+
+  <div class="rodape">
+    <button class="limpar" id="limpar">Limpar marcações</button>
+    <p class="nota">Alturas mínimas, horários e shows mudam sem aviso. Confira o app oficial do parque na véspera e a placa na entrada de cada atração.</p>
+  </div>
+  <p id="status" role="status"></p>
+</div>
+
+<script>
+const PARQUES = [
+{
+  id:"usf", nome:"Universal Studios Florida", cor:"#5BA8F5",
+  nota:{titulo:"O que muda nessas datas", itens:[
+    "O Halloween Horror Nights acontece em 16, 17, 18, 19, 20, 23 e 24 de setembro. Nessas noites o parque fecha às 17h para quem tem ingresso normal. Seus dias livres de HHN aqui são 15, 21 e 22 de setembro.",
+    "Por causa da temporada do HHN, a parada Universal Mega Movie Parade e o show noturno CineSational não estão em cartaz.",
+    "O Horror Make-Up Show está fechado para reforma desde maio e o Fast & Furious – Supercharged fechou de vez em 17 de agosto de 2026."
+  ]},
+  areas:[
+    {nome:"Minion Land", itens:[
+      {nome:"Despicable Me Minion Mayhem", desc:"Simulador com os Minions do Gru.", tags:["1,02 m"]},
+      {nome:"Villain-Con Minion Blast", desc:"Atirador interativo em esteira rolante, sem fila de carrinho.", tags:["1,02 m"]}
+    ]},
+    {nome:"Production Central", itens:[
+      {nome:"TRANSFORMERS: The Ride-3D", top:true, desc:"Dark ride 3D em alta velocidade ao lado do Optimus Prime.", tags:["1,02 m"]}
+    ]},
+    {nome:"New York", itens:[
+      {nome:"Revenge of the Mummy", top:true, desc:"Montanha-russa coberta com fogo de verdade e um final que engana.", tags:["1,22 m"]},
+      {nome:"Race Through New York Starring Jimmy Fallon", desc:"Teatro voador pela cidade. Usa fila virtual com senha.", tags:["1,02 m"]},
+      {nome:"The Blues Brothers Show", desc:"Show de rua curto, na esquina de Delancey Street.", tags:["Rua"]}
+    ]},
+    {nome:"Diagon Alley", itens:[
+      {nome:"Harry Potter and the Escape from Gringotts", top:true, desc:"Dark ride com trechos de montanha-russa dentro do banco dos duendes.", tags:["1,07 m"]},
+      {nome:"Hogwarts Express – King's Cross", top:true, desc:"Trem até Hogsmeade, no Islands of Adventure. A volta tem cenas diferentes da ida.", tags:["Precisa de Park to Park"]},
+      {nome:"Entrar no Beco Diagonal pela parede de tijolos", desc:"A entrada fica escondida na fachada de Londres, perto do Knight Bus.", tags:["Foto"]},
+      {nome:"Ollivanders (Beco Diagonal)", desc:"Mesma cerimônia da varinha de Hogsmeade, com fila costumeiramente menor.", tags:["Show"]},
+      {nome:"Shows do Carkitt Market", desc:"Celestina Warbeck e os contos de Beedle, o Bardo, se revezam durante o dia.", tags:["Show"]},
+      {nome:"Feitiços com a varinha interativa", desc:"As vitrines do Beco Diagonal e da Travessa do Tranco reagem aos gestos.", tags:["Precisa da varinha"]},
+      {nome:"Tomar uma Butterbeer no Leaky Cauldron", desc:"Também vale o suco de abóbora e o Fishy Green Ale da Travessa do Tranco.", tags:["Comida"]}
+    ]},
+    {nome:"World Expo", itens:[
+      {nome:"MEN IN BLACK Alien Attack", top:true, desc:"Disputa de pontaria contra aliens, com placar no fim.", tags:["1,07 m"]}
+    ]},
+    {nome:"Springfield", itens:[
+      {nome:"The Simpsons Ride", top:true, desc:"Simulador em tela gigante pelo parque do Krustyland.", tags:["1,02 m"]},
+      {nome:"Kang & Kodos' Twirl 'n' Hurl", desc:"Versão alienígena do Dumbo, leve e rápida.", tags:["Família"]},
+      {nome:"Comer no Krusty Burger ou tomar uma Duff", desc:"O Flaming Moe e o Lard Lad Donut são os itens mais pedidos.", tags:["Comida"]}
+    ]},
+    {nome:"DreamWorks Land", itens:[
+      {nome:"Trolls Trollercoaster", desc:"Montanha-russa infantil bem curtinha.", tags:["0,92 m","Crianças"]},
+      {nome:"Shrek's Swamp Meet", desc:"Encontro com Shrek e Fiona no pântano.", tags:["Foto"]},
+      {nome:"Po Live! e o campo de treino do Kung Fu Panda", desc:"Show curto com o Po e área de brincar ao lado.", tags:["Crianças"]},
+      {nome:"Poppy's Playground e o pântano do Shrek", desc:"Duas áreas de brincar com jatos d'água para se refrescar.", tags:["Molha um pouco"]},
+      {nome:"Mama Luna Feline Fiesta", desc:"Sala interativa dos gatos do Gato de Botas.", tags:["Crianças"]}
+    ]},
+    {nome:"Hollywood", itens:[
+      {nome:"The Bourne Stuntacular", top:true, desc:"Show de dublês misturando atores ao vivo e uma tela LED gigante. O melhor show do complexo.", tags:["Show"]},
+      {nome:"Animal Actors on Location!", desc:"Show com bichos treinados. Sai de cartaz de vez em novembro de 2026.", tags:["Show"]},
+      {nome:"E.T. Adventure", top:true, desc:"Voo de bicicleta pela floresta. O único ainda em operação no mundo.", tags:["0,86 m","Clássico"]}
+    ]}
+  ],
+  fechadas:[
+    {nome:"Universal Orlando's Horror Make-Up Show", motivo:"Em reforma desde 12 de maio de 2026, volta só no fim do ano."},
+    {nome:"Fast & Furious – Supercharged", motivo:"Fechou permanentemente em 17 de agosto de 2026. No lugar virá o Fast & Furious: Hollywood Drift, em 2027."},
+    {nome:"Hollywood Rip Ride Rockit", motivo:"Fechada permanentemente desde agosto de 2025."},
+    {nome:"Universal Mega Movie Parade e CineSational", motivo:"Fora de cartaz durante a temporada do Halloween Horror Nights."}
+  ]
+},
+{
+  id:"ioa", nome:"Islands of Adventure", cor:"#FF8A3D",
+  nota:{titulo:"O que muda nessas datas", itens:[
+    "O Skull Island: Reign of Kong está fechado sem previsão desde 1º de setembro de 2026. A Universal ainda lista a atração, mas ela não abre há semanas. Confira no app antes de caminhar até lá.",
+    "O Jurassic Park River Adventure está em reforma pesada e só reabre em 20 de novembro de 2026.",
+    "The Lost Continent está sendo desativada em fases. A Mystic Fountain fechou de vez em maio e o restaurante Mythos sai em 2027."
+  ]},
+  areas:[
+    {nome:"Marvel Super Hero Island", itens:[
+      {nome:"The Incredible Hulk Coaster", top:true, desc:"Lançamento de 0 a 64 km/h em 2 segundos e sete inversões.", tags:["1,37 m","Adrenalina alta"]},
+      {nome:"The Amazing Adventures of Spider-Man", top:true, desc:"Dark ride 3D com carrinho que gira, cai e balança pela cidade.", tags:["1,02 m"]},
+      {nome:"Doctor Doom's Fearfall", desc:"Torre que dispara para cima antes da queda livre.", tags:["1,32 m"]},
+      {nome:"Storm Force Accelatron", desc:"Xicarinhas giratórias, versão Tempestade dos X-Men.", tags:["Família"]},
+      {nome:"Encontro com os heróis da Marvel", desc:"Chegam de moto em horários fixos, em frente ao café.", tags:["Foto"]}
+    ]},
+    {nome:"Toon Lagoon", itens:[
+      {nome:"Dudley Do-Right's Ripsaw Falls", desc:"Tronco com queda final de mais de 15 metros.", tags:["1,12 m","Molha bastante"]},
+      {nome:"Popeye & Bluto's Bilge-Rat Barges", desc:"Boia circular em corredeiras. Você sai ensopado, sem exagero.", tags:["1,07 m","Molha muito"]},
+      {nome:"Me Ship, The Olive", desc:"Navio do Popeye com canhões de água que molham quem passa de boia.", tags:["Grátis","Crianças"]}
+    ]},
+    {nome:"Jurassic Park", itens:[
+      {nome:"Jurassic World VelociCoaster", top:true, desc:"A montanha-russa mais intensa do complexo: dois lançamentos e inversão sobre a água.", tags:["1,30 m","Adrenalina alta"]},
+      {nome:"Pteranodon Flyers", desc:"Teleférico suspenso sobre a área. Voltou a operar em julho de 2026.", tags:["Entre 0,92 m e 1,42 m","Fila lenta"]},
+      {nome:"Camp Jurassic", desc:"Playground gigante com cavernas, redes e pontes.", tags:["Grátis","Crianças"]},
+      {nome:"Jurassic Park Discovery Center", desc:"Centro interativo com esqueletos e a incubadora de dinossauros.", tags:["Ar-condicionado"]},
+      {nome:"Raptor Encounter", desc:"Foto cara a cara com a Blue, com tratador segurando a coleira.", tags:["Foto"]}
+    ]},
+    {nome:"Wizarding World — Hogsmeade", itens:[
+      {nome:"Hagrid's Magical Creatures Motorbike Adventure", top:true, desc:"Montanha-russa de motocicleta com sete lançamentos. Costuma ter a maior fila do parque.", tags:["1,22 m","Vá logo cedo"]},
+      {nome:"Harry Potter and the Forbidden Journey", top:true, desc:"Voo pelo castelo em braço robótico. A fila por dentro de Hogwarts vale por si só.", tags:["1,22 m","Enjoa um pouco"]},
+      {nome:"Flight of the Hippogriff", desc:"Montanha-russa curtinha e leve, boa para estrear as crianças.", tags:["0,92 m","Família"]},
+      {nome:"Hogwarts Express (estação de Hogsmeade)", top:true, desc:"Trem até o Beco Diagonal, no Universal Studios.", tags:["Precisa de Park to Park"]},
+      {nome:"Ollivanders (Hogsmeade)", desc:"A varinha escolhe o bruxo, em um show para um grupo pequeno.", tags:["Show"]},
+      {nome:"Feitiços com a varinha interativa", desc:"Medalhões no chão marcam as vitrines que reagem aos feitiços.", tags:["Precisa da varinha"]},
+      {nome:"Tomar uma Butterbeer no Three Broomsticks", desc:"Gelada, congelada ou quente. A congelada é a mais pedida no calor.", tags:["Comida"]}
+    ]},
+    {nome:"Seuss Landing", itens:[
+      {nome:"The Cat in the Hat", desc:"Sofá giratório atravessando a bagunça do Gato de Cartola.", tags:["0,92 m","Família"]},
+      {nome:"One Fish, Two Fish, Red Fish, Blue Fish", desc:"Peixinhos que sobem e descem. Errar a rima significa tomar jato de água.", tags:["Molha um pouco","Crianças"]},
+      {nome:"Caro-Seuss-el", desc:"Carrossel com bichos que mexem olhos e rabo.", tags:["Crianças"]},
+      {nome:"The High in the Sky Seuss Trolley Train Ride", desc:"Trenzinho suspenso com volta panorâmica pela ilha.", tags:["0,86 m","Família"]}
+    ]}
+  ],
+  fechadas:[
+    {nome:"Skull Island: Reign of Kong", motivo:"Fechada sem previsão desde 1º de setembro de 2026."},
+    {nome:"Jurassic Park River Adventure", motivo:"Em reforma até 19 de novembro de 2026."},
+    {nome:"The Lost Continent", motivo:"Área em desativação. A Mystic Fountain fechou permanentemente em maio de 2026."}
+  ]
+},
+{
+  id:"epic", nome:"Epic Universe", cor:"#A08CFF",
+  nota:{titulo:"O que muda nessas datas", itens:[
+    "O show The Untrainable Dragon, na Isle of Berk, fica fechado de 15 a 20 de setembro. Volta no dia 21, então deixe ele para a segunda metade da viagem.",
+    "A Cosmos Fountain, no Celestial Park, fechou permanentemente em julho de 2026."
+  ]},
+  areas:[
+    {nome:"Celestial Park", itens:[
+      {nome:"Stardust Racers", top:true, desc:"Montanha-russa dupla que corre lado a lado a 100 km/h. A mais intensa do parque.", tags:["1,22 m","Adrenalina alta"]},
+      {nome:"Constellation Carousel", desc:"Carrossel de criaturas celestes que giram no próprio eixo.", tags:["Família"]},
+      {nome:"Ver as fontes do hub à noite", desc:"O Celestial Park inteiro muda de cara depois do pôr do sol.", tags:["Noite"]}
+    ]},
+    {nome:"Super Nintendo World", itens:[
+      {nome:"Mario Kart: Bowser's Challenge", top:true, desc:"Dark ride com óculos de realidade aumentada onde você joga cascos nos adversários.", tags:["1,02 m"]},
+      {nome:"Mine-Cart Madness", top:true, desc:"Montanha-russa do Donkey Kong que simula pular trilhos quebrados.", tags:["0,92 m"]},
+      {nome:"Yoshi's Adventure", desc:"Passeio lento e panorâmico, ótimo para ver a área toda do alto.", tags:["0,86 m","Crianças"]},
+      {nome:"Jogar com a Power-Up Band", desc:"Bater nos blocos, resolver os desafios de chave e enfrentar um chefão.", tags:["Compra à parte"]}
+    ]},
+    {nome:"Dark Universe", itens:[
+      {nome:"Monsters Unchained: The Frankenstein Experiment", top:true, desc:"Dark ride sombrio com animatrônicos impressionantes. Intenso demais para crianças pequenas.", tags:["1,22 m","Sustos"]},
+      {nome:"Curse of the Werewolf", desc:"Montanha-russa familiar girando pela floresta dos lobisomens.", tags:["1,02 m"]},
+      {nome:"Encontrar os monstros pelas ruas", desc:"A Noiva, o Homem Invisível e companhia circulam pela vila e interagem de verdade.", tags:["Foto"]}
+    ]},
+    {nome:"How to Train Your Dragon — Isle of Berk", itens:[
+      {nome:"Hiccup's Wing Gliders", top:true, desc:"Montanha-russa lançada que sobrevoa a vila viking. A melhor da área.", tags:["1,02 m"]},
+      {nome:"Dragon Racer's Rally", desc:"Braços giratórios em que você controla a inclinação. Dá frio na barriga.", tags:["1,22 m"]},
+      {nome:"Fyre Drill", desc:"Barquinhos giratórios com mangueiras. Todo mundo se molha, inclusive quem assiste.", tags:["0,92 m","Molha muito"]},
+      {nome:"Viking Training Camp", desc:"Circuito de escalada e obstáculos para as crianças.", tags:["Crianças"]},
+      {nome:"The Untrainable Dragon", desc:"Show com bonecos gigantes do Banguela. Fechado de 15 a 20/09, volta dia 21.", tags:["Show","Só a partir de 21/09"]}
+    ]},
+    {nome:"Wizarding World — Ministry of Magic", itens:[
+      {nome:"Harry Potter and the Battle at the Ministry", top:true, desc:"O dark ride mais avançado do complexo, entre a Paris dos anos 1920 e o Ministério da Magia.", tags:["1,02 m"]},
+      {nome:"Le Cirque Arcanus", desc:"Show de ilusionismo na Paris bruxa, com efeitos que enganam mesmo de perto.", tags:["Show"]},
+      {nome:"Feitiços com a varinha interativa", desc:"Os pontos de feitiço ficam espalhados entre Paris e Londres.", tags:["Precisa da varinha"]}
+    ]}
+  ],
+  fechadas:[
+    {nome:"The Cosmos Fountain", motivo:"Fechada permanentemente em 7 de julho de 2026."}
+  ]
+},
+{
+  id:"mk", nome:"Magic Kingdom", cor:"#FF6FA8",
+  nota:{titulo:"O que muda nessas datas", itens:[
+    "O Mickey's Not-So-Scary acontece em 15, 18, 20, 22 e 24 de setembro. Nessas noites o parque fecha às 18h para quem tem ingresso normal e o Happily Ever After só é exibido para quem pagou a festa. Se der, priorize 16, 17, 19, 21 ou 23 de setembro aqui.",
+    "O Castelo da Cinderela está sendo repintado até o fim de 2026. Os guindastes descem por volta do meio-dia, então as fotos de tarde e de noite continuam limpas.",
+    "Rivers of America, Tom Sawyer Island e o barco Liberty Belle foram fechados de vez. O calçadão da Frontierland está murado por causa das obras do Piston Peak.",
+    "O Carousel of Progress está fechado desde julho e só volta em 2027."
+  ]},
+  areas:[
+    {nome:"Main Street, U.S.A.", itens:[
+      {nome:"Walt Disney World Railroad", desc:"Rota reduzida: só entre Main Street e a Fantasyland. Fecha para reforma em 28 de setembro.", tags:["Rota parcial"]},
+      {nome:"Festival of Fantasy Parade", top:true, desc:"A parada diurna, com o dragão da Malévola soltando fogo.", tags:["Parada"]},
+      {nome:"Happily Ever After", top:true, desc:"Fogos e projeções no castelo, às 21h. Não rola nas noites de festa.", tags:["Noite"]}
+    ]},
+    {nome:"Adventureland", itens:[
+      {nome:"Pirates of the Caribbean", top:true, desc:"Clássico absoluto, com queda curta e cenários enormes.", tags:["Clássico"]},
+      {nome:"Jungle Cruise", top:true, desc:"Vale pelo texto do capitão, cheio de trocadilhos. Cada guia tem o seu.", tags:["Clássico"]},
+      {nome:"The Magic Carpets of Aladdin", desc:"Tapetes voadores com camelos que cospem água.", tags:["Crianças"]},
+      {nome:"Walt Disney's Enchanted Tiki Room", desc:"Pássaros cantores em sala refrigerada. Ótima pausa no calor.", tags:["Ar-condicionado"]},
+      {nome:"The Beak and Barrel", desc:"Bar temático de piratas aberto em 2025. Costuma exigir reserva.", tags:["Reserva","Bebida"]}
+    ]},
+    {nome:"Frontierland", itens:[
+      {nome:"Big Thunder Mountain Railroad", top:true, desc:"Reabriu em maio de 2026 depois de uma reforma enorme, com a cena das Cavernas do Arco-Íris refeita.", tags:["0,97 m","Novidade"]},
+      {nome:"Tiana's Bayou Adventure", top:true, desc:"Tronco com queda de 15 metros e trilha sonora nova.", tags:["1,02 m","Molha"]},
+      {nome:"Country Bear Musical Jamboree", desc:"Ursos animatrônicos cantando versões country de músicas Disney.", tags:["Show"]}
+    ]},
+    {nome:"Liberty Square", itens:[
+      {nome:"Haunted Mansion", top:true, desc:"A mansão dos 999 fantasmas. Fila externa vale a pena pelos detalhes.", tags:["Clássico"]},
+      {nome:"The Hall of Presidents", desc:"Todos os presidentes americanos em animatrônico, em sala gelada.", tags:["Ar-condicionado"]}
+    ]},
+    {nome:"Fantasyland", itens:[
+      {nome:"Seven Dwarfs Mine Train", top:true, desc:"Montanha-russa com vagões que balançam. A fila mais longa do parque quase sempre.", tags:["0,97 m"]},
+      {nome:"Peter Pan's Flight", top:true, desc:"Barquinhos suspensos sobre Londres. Fila costuma enganar, entre cedo.", tags:["Clássico"]},
+      {nome:"Under the Sea: Journey of The Little Mermaid", desc:"Dark ride da Ariel, quase sempre com fila curta.", tags:["Família"]},
+      {nome:"Mickey's PhilharMagic", desc:"Filme 4D com cheiros e água. Melhor do que parece.", tags:["Ar-condicionado"]},
+      {nome:"The Many Adventures of Winnie the Pooh", desc:"Dark ride leve com uma cena de sonho muito bem feita.", tags:["Crianças"]},
+      {nome:"\"it's a small world\"", desc:"Passeio de barco pelas bonecas do mundo inteiro.", tags:["Clássico"]},
+      {nome:"Enchanted Tales with Belle", desc:"Encontro interativo em que a plateia vira parte da história.", tags:["Crianças"]},
+      {nome:"Prince Charming Regal Carrousel", desc:"O carrossel em frente ao castelo.", tags:["Crianças"]},
+      {nome:"Dumbo the Flying Elephant", desc:"Fila com área de brincar coberta, boa com criança pequena.", tags:["Crianças"]},
+      {nome:"Mad Tea Party", desc:"As xícaras giratórias do Chapeleiro.", tags:["Família"]},
+      {nome:"The Barnstormer", desc:"Montanha-russa infantil do Goofy.", tags:["0,89 m","Crianças"]}
+    ]},
+    {nome:"Tomorrowland", itens:[
+      {nome:"TRON Lightcycle / Run", top:true, desc:"A montanha-russa mais rápida do parque, de moto. Entre pela fila padrão ou Lightning Lane.", tags:["1,22 m","Adrenalina alta"]},
+      {nome:"Space Mountain", top:true, desc:"Montanha-russa no escuro total. Sacode bastante.", tags:["1,12 m"]},
+      {nome:"Buzz Lightyear's Space Ranger Spin", desc:"Repaginado em 2026, com efeitos e alvos novos.", tags:["Novidade"]},
+      {nome:"Tomorrowland Transit Authority PeopleMover", desc:"Passeio suspenso e gratuito que atravessa o Space Mountain por dentro.", tags:["Relaxante"]},
+      {nome:"Monsters, Inc. Laugh Floor", desc:"Show interativo em que o público manda piadas por mensagem.", tags:["Ar-condicionado"]},
+      {nome:"Astro Orbiter", desc:"Foguetes no alto da Tomorrowland. Vista boa, fila lenta.", tags:["Família"]}
+    ]}
+  ],
+  fechadas:[
+    {nome:"Walt Disney's Carousel of Progress", motivo:"Fechado desde 6 de julho de 2026 para uma reimaginação. Volta em 2027."},
+    {nome:"Tom Sawyer Island, Liberty Belle e Rivers of America", motivo:"Fechados permanentemente. No lugar vem a Piston Peak, área do Carros."},
+    {nome:"Pete's Silly Sideshow", motivo:"Fechado desde janeiro de 2026, sem data de retorno."}
+  ]
+},
+{
+  id:"epcot", nome:"EPCOT", cor:"#4ECBC4",
+  nota:{titulo:"O que muda nessas datas", itens:[
+    "O Food & Wine Festival está rolando (27/08 a 21/11) e é o melhor motivo para visitar o EPCOT em setembro. Está incluso no ingresso; você paga só o que consumir.",
+    "A exposição Cheers to Cheese!, no CommuniCore Hall, abre em 18 de setembro. Se for antes disso, ela ainda não estará lá.",
+    "O restaurante Coral Reef fechou para reforma em 8 de setembro."
+  ]},
+  areas:[
+    {nome:"World Celebration", itens:[
+      {nome:"Spaceship Earth", top:true, desc:"O passeio dentro da esfera, contando a história da comunicação.", tags:["Clássico"]},
+      {nome:"Journey Into Imagination with Figment", desc:"Dark ride datado, mas divertido, com o dragãozinho roxo.", tags:["Família"]},
+      {nome:"Club Cool", desc:"Refrigerantes da Coca-Cola do mundo todo, de graça. Encare o Beverly.", tags:["Grátis"]},
+      {nome:"Cheers to Cheese! no CommuniCore Hall", desc:"Exposição interativa sobre queijos, só a partir de 18 de setembro.", tags:["Só a partir de 18/09"]}
+    ]},
+    {nome:"World Discovery", itens:[
+      {nome:"Guardians of the Galaxy: Cosmic Rewind", top:true, desc:"Montanha-russa que gira 360° acompanhando a música. A melhor do parque.", tags:["1,07 m","Adrenalina alta"]},
+      {nome:"Test Track", top:true, desc:"Versão nova desde 2025, com foco em mobilidade. Termina a 105 km/h na pista externa.", tags:["1,02 m"]},
+      {nome:"Mission: SPACE", desc:"Simulador com duas versões. A laranja gira de verdade e enjoa; a verde é tranquila.", tags:["1,02 m verde / 1,12 m laranja"]}
+    ]},
+    {nome:"World Nature", itens:[
+      {nome:"Soarin' Across America", top:true, desc:"Versão nova desde maio de 2026, agora sobrevoando só os Estados Unidos.", tags:["1,02 m","Novidade"]},
+      {nome:"Living with the Land", desc:"Barco pelas estufas reais onde a Disney cultiva parte do que serve.", tags:["Relaxante"]},
+      {nome:"The Seas with Nemo & Friends", desc:"Dark ride que desemboca no aquário gigante.", tags:["Família"]},
+      {nome:"Turtle Talk with Crush", desc:"Conversa ao vivo com a tartaruga, que responde a plateia de verdade.", tags:["Crianças"]},
+      {nome:"Awesome Planet", desc:"Documentário curto sobre a Terra, com efeitos na sala.", tags:["Ar-condicionado"]}
+    ]},
+    {nome:"World Showcase", itens:[
+      {nome:"Frozen Ever After (Noruega)", top:true, desc:"Barco pelo reino de Arendelle com os animatrônicos de Elsa e Anna.", tags:["Família"]},
+      {nome:"Remy's Ratatouille Adventure (França)", top:true, desc:"Você encolhe ao tamanho de um rato e corre pela cozinha do Gusteau.", tags:["Família"]},
+      {nome:"Gran Fiesta Tour (México)", desc:"Barco tranquilo dentro da pirâmide, com o Zé Carioca.", tags:["Relaxante"]},
+      {nome:"The American Adventure", desc:"Show com animatrônicos de Ben Franklin e Mark Twain.", tags:["Ar-condicionado"]},
+      {nome:"Impressions de France e o sing-along da Bela", desc:"Dois filmes no pavilhão francês, em sessões alternadas.", tags:["Ar-condicionado"]},
+      {nome:"Reflections of China", desc:"Filme em 360° no pavilhão chinês, assistido de pé.", tags:["Ar-condicionado"]},
+      {nome:"Canada Far and Wide", desc:"Filme em tela circular narrado pelo Eugene Levy.", tags:["Ar-condicionado"]},
+      {nome:"Dar a volta completa no World Showcase", desc:"São cerca de 2 km entre os 11 pavilhões. Faça no fim da tarde.", tags:["Caminhada"]},
+      {nome:"Comer em pelo menos 5 barracas do Food & Wine", desc:"Pegue o passaporte do festival na entrada para ir carimbando.", tags:["Comida"]},
+      {nome:"Luminous: The Symphony of Us", top:true, desc:"Show noturno com fogos, fontes e drones sobre a lagoa.", tags:["Noite"]}
+    ]}
+  ],
+  fechadas:[
+    {nome:"Coral Reef Restaurant", motivo:"Fechado para reforma desde 8 de setembro de 2026."},
+    {nome:"La Signature (França)", motivo:"Loja de perfumes fechada para reforma desde junho de 2026."}
+  ]
+},
+{
+  id:"ak", nome:"Animal Kingdom", cor:"#8FC04F",
+  nota:{titulo:"O que muda nessas datas", itens:[
+    "A DinoLand U.S.A. inteira fechou permanentemente em fevereiro de 2026, incluindo o DINOSAUR. A área virou canteiro de obras da Tropical Americas, com rides de Encanto e Indiana Jones sem data confirmada de abertura.",
+    "O parque tem menos atrações do que tinha há dois anos, então um dia costuma sobrar. Vale combinar com uma tarde livre ou com o Rafiki's Planet Watch, que quase ninguém faz.",
+    "O Kilimanjaro Safaris rende muito mais logo na abertura ou no fim da tarde, quando os bichos estão ativos."
+  ]},
+  areas:[
+    {nome:"Discovery Island", itens:[
+      {nome:"Zootopia: Better Zoogether!", top:true, desc:"Show 4D no teatro da Árvore da Vida, que substituiu o It's Tough to Be a Bug.", tags:["Novidade","Ar-condicionado"]},
+      {nome:"Trilhas da Árvore da Vida", desc:"Caminhos laterais com os animais esculpidos no tronco e recintos pequenos.", tags:["Caminhada"]},
+      {nome:"Wilderness Explorers", desc:"Caça aos distintivos pelo parque inteiro, no estilo do filme Up. Grátis e viciante.", tags:["Grátis","Crianças"]},
+      {nome:"Tree of Life Awakenings", desc:"Projeções na árvore depois do escurecer, em ciclos curtos.", tags:["Noite"]}
+    ]},
+    {nome:"Pandora — The World of Avatar", itens:[
+      {nome:"Avatar Flight of Passage", top:true, desc:"Voo em um banshee, a melhor atração do complexo Disney. Vá na abertura.", tags:["1,12 m","Vá logo cedo"]},
+      {nome:"Na'vi River Journey", top:true, desc:"Barco silencioso pela floresta bioluminescente, com um animatrônico impressionante no fim.", tags:["Família"]},
+      {nome:"Voltar à Pandora depois do escurecer", top:true, desc:"A área inteira brilha à noite. É outra experiência, e vale mesmo sem entrar em nada.", tags:["Noite"]}
+    ]},
+    {nome:"Africa", itens:[
+      {nome:"Kilimanjaro Safaris", top:true, desc:"Safári de verdade em 45 hectares, com leões, girafas e elefantes soltos.", tags:["Vá logo cedo"]},
+      {nome:"Gorilla Falls Exploration Trail", desc:"Trilha a pé com gorilas, hipopótamos e um aviário grande.", tags:["Caminhada"]},
+      {nome:"Festival of the Lion King", top:true, desc:"Show em teatro redondo com acrobatas e carros alegóricos. O melhor show do parque.", tags:["Show","Ar-condicionado"]}
+    ]},
+    {nome:"Rafiki's Planet Watch", itens:[
+      {nome:"Wildlife Express Train", desc:"Trenzinho que leva até a área dos bastidores. Só se chega por ele.", tags:["Passeio"]},
+      {nome:"Bluey's Wild World", desc:"Área nova, aberta em maio de 2026, com a turma do Bluey.", tags:["Novidade","Crianças"]},
+      {nome:"The Animation Experience", desc:"Aula de desenho guiada, com um animal Disney diferente por sessão.", tags:["Grátis","Ar-condicionado"]}
+    ]},
+    {nome:"Asia", itens:[
+      {nome:"Expedition Everest", top:true, desc:"Montanha-russa com trecho de marcha a ré no escuro e o Yeti no final.", tags:["1,12 m","Adrenalina alta"]},
+      {nome:"Kali River Rapids", desc:"Boia circular curtinha. Molha bastante e pode molhar só você.", tags:["1,12 m","Molha muito"]},
+      {nome:"Maharajah Jungle Trek", desc:"Trilha com tigres, dragões-de-komodo e morcegos gigantes.", tags:["Caminhada"]},
+      {nome:"Feathered Friends in Flight!", desc:"Show de aves que voam por cima da plateia.", tags:["Show"]},
+      {nome:"Finding Nemo: The Big Blue... and Beyond!", desc:"Musical com bonecos manipulados à vista, em teatro fechado.", tags:["Show","Ar-condicionado"]}
+    ]}
+  ],
+  fechadas:[
+    {nome:"DinoLand U.S.A. (DINOSAUR, TriceraTop Spin, The Boneyard)", motivo:"Fechada permanentemente em 2 de fevereiro de 2026. Vira a Tropical Americas."},
+    {nome:"It's Tough to Be a Bug!", motivo:"Fechado permanentemente. No lugar entrou o show da Zootopia."}
+  ]
+},
+{
+  id:"dhs", nome:"Hollywood Studios", cor:"#FFD24A",
+  nota:{titulo:"O que muda nessas datas", itens:[
+    "A área nova The Magic of Disney Animation estreia em 14 de setembro, na véspera da sua chegada. Você pega tudo em primeira mão, mas espere fila e ajustes de última hora.",
+    "O Rock 'n' Roller Coaster agora é dos Muppets, com temática trocada desde maio de 2026. O trajeto é o mesmo, o resto mudou inteiro.",
+    "O Muppet*Vision 3D e o Star Wars Launch Bay fecharam de vez. A área dos Muppets vira a Monstropolis a partir de 2027."
+  ]},
+  areas:[
+    {nome:"Sunset Boulevard", itens:[
+      {nome:"The Twilight Zone Tower of Terror", top:true, desc:"Elevador maldito com sequência de quedas aleatória. O melhor do parque.", tags:["1,02 m","Adrenalina alta"]},
+      {nome:"Rock 'n' Roller Coaster Starring The Muppets", top:true, desc:"Lançamento de 0 a 92 km/h com inversões no escuro, agora com a banda Electric Mayhem.", tags:["1,22 m","Novidade"]},
+      {nome:"Beauty and the Beast — Live on Stage", desc:"Musical em teatro aberto, versão condensada do filme.", tags:["Show"]},
+      {nome:"Fantasmic!", top:true, desc:"Show noturno com água, fogo e projeções no anfiteatro. Chegue cedo para pegar lugar.", tags:["Noite"]}
+    ]},
+    {nome:"Hollywood Boulevard", itens:[
+      {nome:"Mickey & Minnie's Runaway Railway", top:true, desc:"Dark ride sem trilhos visíveis, dentro de um desenho do Mickey.", tags:["Família"]},
+      {nome:"Wonderful World of Animation", desc:"Projeções no Chinese Theatre repassando 90 anos de animação.", tags:["Noite"]}
+    ]},
+    {nome:"Echo Lake", itens:[
+      {nome:"Star Tours – The Adventures Continue", desc:"Simulador com combinações aleatórias de destino. Dá para repetir sem repetir.", tags:["1,02 m"]},
+      {nome:"Indiana Jones Epic Stunt Spectacular!", desc:"Show de dublês recriando cenas do primeiro filme.", tags:["Show"]},
+      {nome:"For the First Time in Forever: A Frozen Sing-Along", desc:"Sing-along com dois narradores que roubam a cena.", tags:["Ar-condicionado"]}
+    ]},
+    {nome:"The Walt Disney Studios Lot", itens:[
+      {nome:"The Magic of Disney Animation", top:true, desc:"Área nova em 14 de setembro de 2026, no antigo Launch Bay: galerias interativas, sala de projeção e encontros com personagens.", tags:["Estreia 14/09","Novidade"]},
+      {nome:"Animation Academy: Olaf Draws!", desc:"Aula de desenho guiada pelo Olaf, também estreando em 14 de setembro.", tags:["Estreia 14/09"]},
+      {nome:"Off the Page!", desc:"Experiência nova do mesmo pacote, no pátio reimaginado.", tags:["Novidade"]},
+      {nome:"Disney Jr. Mickey Mouse Clubhouse Live!", desc:"Show de dança para os pequenos, aberto em maio de 2026.", tags:["Crianças"]},
+      {nome:"The Little Mermaid: A Musical Adventure", desc:"Versão nova do musical da Ariel, com marionetes e projeções.", tags:["Show"]},
+      {nome:"Disney Villains: Unfairly Ever After", desc:"Show dos vilões com a Malévola e a Rainha Má. Nada a ver com Halloween.", tags:["Show"]}
+    ]},
+    {nome:"Toy Story Land", itens:[
+      {nome:"Slinky Dog Dash", top:true, desc:"Montanha-russa familiar com dois lançamentos. Fila grande o dia inteiro.", tags:["0,97 m","Vá logo cedo"]},
+      {nome:"Toy Story Mania!", top:true, desc:"Disputa de pontaria em 3D. Um dos poucos em que dá vontade de repetir na hora.", tags:["Família"]},
+      {nome:"Alien Swirling Saucers", desc:"Discos voadores que jogam você de um lado para o outro. Bem curtinho.", tags:["0,81 m","Crianças"]}
+    ]},
+    {nome:"Star Wars: Galaxy's Edge", itens:[
+      {nome:"Star Wars: Rise of the Resistance", top:true, desc:"A atração mais ambiciosa da Disney: 18 minutos entre pré-shows, andróides e queda livre.", tags:["1,02 m","Vá logo cedo"]},
+      {nome:"Millennium Falcon: Smugglers Run", top:true, desc:"Você pilota a Falcon. Desde maio de 2026 com missão nova, do Mando e do Grogu.", tags:["0,97 m","Novidade"]},
+      {nome:"Beber no Oga's Cantina", desc:"Bar temático com DJ droide. Precisa de reserva e o tempo de mesa é limitado.", tags:["Reserva","Bebida"]},
+      {nome:"Montar um sabre de luz ou um droide", desc:"Savi's Workshop e Droid Depot. Caro, mas é a lembrança que todo mundo guarda.", tags:["Compra à parte"]}
+    ]},
+    {nome:"Grand Avenue e arredores", itens:[
+      {nome:"Lightning McQueen's Racing Academy", desc:"Show curto com o McQueen em tela panorâmica.", tags:["Crianças"]}
+    ]}
+  ],
+  fechadas:[
+    {nome:"Muppet*Vision 3D", motivo:"Fechado permanentemente. A área vira a Monstropolis a partir de 2027."},
+    {nome:"Star Wars: Launch Bay e Animation Courtyard", motivo:"Fechados permanentemente. Deram lugar ao The Walt Disney Studios Lot."},
+    {nome:"Rock 'n' Roller Coaster Starring Aerosmith", motivo:"Aposentado em março de 2026, substituído pela versão dos Muppets."}
+  ]
+}
+];
+
+/* ---------- estado ---------- */
+function slug(s){
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"").slice(0,42);
+}
+PARQUES.forEach(p => p.areas.forEach(a => a.itens.forEach(it => { it.id = p.id + ":" + slug(it.nome); })));
+const TODOS = PARQUES.flatMap(p => p.areas.flatMap(a => a.itens));
+
+const KEY = "orlando-set2026-v1";
+let feitos = {}, filtro = "todas", soTop = false, parque = PARQUES[0].id;
+const temStorage = typeof window !== "undefined" && !!window.storage;
+
+const $cont = document.getElementById("conteudo");
+const $status = document.getElementById("status");
+function aviso(t){ $status.textContent = t || ""; }
+
+async function carregar(){
+  if(!temStorage){ aviso("Salvamento indisponível aqui: as marcações valem só nesta sessão."); return; }
+  try{
+    const r = await window.storage.get(KEY);
+    if(r && r.value){ const v = JSON.parse(r.value); feitos = v.feitos || {}; if(v.parque) parque = v.parque; }
+  }catch(e){ /* primeira abertura */ }
+}
+let pendente = null;
+function salvar(){
+  if(!temStorage) return;
+  clearTimeout(pendente);
+  pendente = setTimeout(async () => {
+    try{ await window.storage.set(KEY, JSON.stringify({ feitos, parque })); aviso(""); }
+    catch(e){ aviso("Não deu para salvar agora. Tente de novo com internet melhor."); }
+  }, 250);
+}
+function hoje(){
+  const d = new Date();
+  return String(d.getDate()).padStart(2,"0") + "/" + String(d.getMonth()+1).padStart(2,"0");
+}
+function alternar(id){
+  if(feitos[id]) delete feitos[id]; else feitos[id] = hoje();
+  salvar(); desenhar();
+}
+function visiveis(itens){
+  return itens.filter(it => {
+    if(soTop && !it.top) return false;
+    if(filtro === "falta" && feitos[it.id]) return false;
+    if(filtro === "feito" && !feitos[it.id]) return false;
+    return true;
+  });
+}
+function contaParque(p){
+  const t = p.areas.flatMap(a => a.itens);
+  return { feitos: t.filter(i => feitos[i.id]).length, total: t.length };
+}
+
+/* ---------- desenho ---------- */
+function abas(){
+  const el = document.getElementById("abas");
+  el.innerHTML = "";
+  PARQUES.forEach(p => {
+    const b = document.createElement("button");
+    b.className = "aba"; b.type = "button";
+    b.style.setProperty("--pc", p.cor);
+    b.setAttribute("aria-pressed", p.id === parque ? "true" : "false");
+    const c = contaParque(p);
+    b.textContent = p.nome + "  " + c.feitos + "/" + c.total;
+    b.addEventListener("click", () => { parque = p.id; salvar(); desenhar(); window.scrollTo({top:0,behavior:"smooth"}); });
+    el.appendChild(b);
+  });
+}
+function placar(){
+  const n = TODOS.filter(i => feitos[i.id]).length;
+  document.getElementById("contagem").firstChild.nodeValue = String(n);
+  document.getElementById("total").textContent = "/" + TODOS.length;
+  const t = document.getElementById("trilha");
+  t.innerHTML = "";
+  PARQUES.forEach(p => {
+    const g = document.createElement("button");
+    g.className = "grupo"; g.type = "button"; g.style.color = p.cor; g.title = p.nome;
+    g.setAttribute("aria-label", p.nome);
+    p.areas.flatMap(a => a.itens).forEach(it => {
+      const i = document.createElement("i");
+      i.className = "pino" + (feitos[it.id] ? " on" : "");
+      g.appendChild(i);
+    });
+    g.addEventListener("click", () => { parque = p.id; salvar(); desenhar(); });
+    t.appendChild(g);
+  });
+}
+function desenhar(){
+  abas(); placar();
+  const p = PARQUES.find(x => x.id === parque);
+  $cont.innerHTML = "";
+  $cont.style.setProperty("--cor", p.cor);
+
+  const cab = document.createElement("div");
+  cab.className = "cabeca";
+  const h = document.createElement("h2"); h.textContent = p.nome; cab.appendChild(h);
+  const c = contaParque(p);
+  const q = document.createElement("p"); q.className = "quantos";
+  q.textContent = c.feitos + " de " + c.total + " marcadas neste parque";
+  cab.appendChild(q);
+  $cont.appendChild(cab);
+
+  if(p.nota && filtro === "todas" && !soTop){
+    const n = document.createElement("div");
+    n.className = "nota-parque";
+    const b = document.createElement("b"); b.textContent = p.nota.titulo; n.appendChild(b);
+    const ul = document.createElement("ul");
+    p.nota.itens.forEach(x => { const li = document.createElement("li"); li.textContent = x; ul.appendChild(li); });
+    n.appendChild(ul);
+    $cont.appendChild(n);
+  }
+
+  let algo = false;
+  p.areas.forEach(area => {
+    const mostrar = visiveis(area.itens);
+    if(!mostrar.length) return;
+    algo = true;
+    const sec = document.createElement("section");
+    sec.className = "area";
+    const h3 = document.createElement("h3"); h3.textContent = area.nome; sec.appendChild(h3);
+
+    mostrar.forEach(it => {
+      const b = document.createElement("button");
+      b.className = "item"; b.type = "button";
+      b.setAttribute("aria-pressed", feitos[it.id] ? "true" : "false");
+      b.addEventListener("click", () => alternar(it.id));
+
+      const m = document.createElement("span");
+      m.className = "marca";
+      m.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 13 9.5 18.5 20 6"/></svg>';
+      b.appendChild(m);
+
+      const corpo = document.createElement("span"); corpo.className = "corpo";
+      const nome = document.createElement("span"); nome.className = "nome"; nome.textContent = it.nome;
+      if(it.top){ const e = document.createElement("span"); e.className = "estrela"; e.textContent = "imperdível"; nome.appendChild(e); }
+      corpo.appendChild(nome);
+
+      const d = document.createElement("span"); d.className = "desc"; d.textContent = it.desc; corpo.appendChild(d);
+
+      if(it.tags && it.tags.length){
+        const meta = document.createElement("span"); meta.className = "meta";
+        it.tags.forEach((t,i) => {
+          const s = document.createElement("span");
+          s.className = "tag" + (i === 0 ? " alt" : "");
+          s.textContent = t; meta.appendChild(s);
+        });
+        corpo.appendChild(meta);
+      }
+      if(feitos[it.id]){
+        const w = document.createElement("span"); w.className = "quando";
+        w.textContent = "feito em " + feitos[it.id]; corpo.appendChild(w);
+      }
+      b.appendChild(corpo);
+      sec.appendChild(b);
+    });
+    $cont.appendChild(sec);
+  });
+
+  if(!algo){
+    const v = document.createElement("p"); v.className = "vazio";
+    v.textContent = filtro === "feito"
+      ? "Nada marcado neste parque ainda."
+      : "Tudo dessa seleção já está marcado aqui.";
+    $cont.appendChild(v);
+  }
+
+  if(p.fechadas && p.fechadas.length && filtro !== "feito" && !soTop){
+    const bl = document.createElement("div"); bl.className = "bloco-fechadas";
+    const h3 = document.createElement("h3"); h3.textContent = "Fechado nessas datas"; bl.appendChild(h3);
+    p.fechadas.forEach(f => {
+      const div = document.createElement("div"); div.className = "fechada";
+      const a = document.createElement("div"); a.className = "fn"; a.textContent = f.nome;
+      const b2 = document.createElement("div"); b2.className = "fm"; b2.textContent = f.motivo;
+      div.appendChild(a); div.appendChild(b2); bl.appendChild(div);
+    });
+    $cont.appendChild(bl);
+  }
+}
+
+/* ---------- controles ---------- */
+document.querySelectorAll(".chip[data-filtro]").forEach(ch => {
+  ch.addEventListener("click", () => {
+    filtro = ch.dataset.filtro;
+    document.querySelectorAll(".chip[data-filtro]").forEach(o =>
+      o.setAttribute("aria-pressed", o === ch ? "true" : "false"));
+    desenhar();
+  });
+});
+document.getElementById("f-top").addEventListener("click", e => {
+  soTop = !soTop;
+  e.currentTarget.setAttribute("aria-pressed", soTop ? "true" : "false");
+  desenhar();
+});
+document.getElementById("limpar").addEventListener("click", () => {
+  if(!Object.keys(feitos).length) return;
+  if(confirm("Apagar todas as marcações dos sete parques?")){ feitos = {}; salvar(); desenhar(); }
+});
+
+(async function(){ await carregar(); desenhar(); })();
+</script>
+</body>
+</html>
